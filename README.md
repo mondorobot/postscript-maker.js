@@ -106,3 +106,34 @@ In addition to working normally with standard web browsers when included globall
 
     wrap(text, width, fontSize): returns an array of strings, wrapped to the given width (in pt) when using the given font size (in pt)
     width(text, fontSize): returns the width (in pt) of the text at the given font size (in pt)
+
+___
+<div style="text-align:center">
+<p>
+  <br />
+  <br />
+  `*******`<br />
+  `**********`<br />
+  `*****************************`<br />
+  `*******************************************`<br />
+  `**************************************************`<br />
+  `*****************************************************`<br />
+  `*******`&emsp;&emsp;`********************************`&emsp;&emsp;`*******`<br />
+  `*******`&emsp;&emsp;&emsp;`********* CREATED BY: *********`&emsp;&emsp;&emsp;`*******`<br />
+  `**********`&emsp;&emsp;`******* MONDO ROBOT LLC *******`&emsp;&emsp;`**********`<br />
+  `***********`&emsp;`*****`<a href="http://www.mondorobot.com">www.mondorobot.com</a>`*****`&emsp;`***********`<br />
+  `*****************************************************************`<br />
+  `******************************************************************`<br />
+  `***********************************************************`<br />
+  `*************************************************`<br />
+  `********************************************`<br />
+  `*******************`&emsp;`*******************`<br />
+  `*****************`&emsp;&emsp;&emsp;&emsp;`*****************`<br />
+  `***************`&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;`***************`<br />
+  `**************`&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;`**************`<br />
+  `***********`&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;`***********`<br />
+  `********`&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;`********`<br />
+  `******`&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;`*****`<br />
+  <img src="mondo-logo-red.png"/><br />
+</p>
+</div>
