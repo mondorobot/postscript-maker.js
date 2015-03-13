@@ -108,7 +108,7 @@ In addition to working normally with standard web browsers when included globall
     width(text, fontSize): returns the width (in pt) of the text at the given font size (in pt)
 
 ___
-->
+<div style="text-align:center" markdown="1">
   <br />
   <br />
   `*******`<br />
@@ -134,4 +134,4 @@ ___
   `********`&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;`********`<br />
   `******`&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;`*****`<br />
   <img src="mondo-logo-red.png"/><br />
-<-
+</div>
