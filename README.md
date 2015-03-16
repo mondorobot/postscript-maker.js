@@ -107,10 +107,10 @@ In addition to working normally with standard web browsers when included globall
     wrap(text, width, fontSize): returns an array of strings, wrapped to the given width (in pt) when using the given font size (in pt)
     width(text, fontSize): returns the width (in pt) of the text at the given font size (in pt)
 
-    ___
+
+___
 
           ∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞
-
 
                                            8888888888
                                           8 ˚ 888 ˚ 8
@@ -157,8 +157,6 @@ In addition to working normally with standard web browsers when included globall
                   888888888                                         8888888888
                  88888888                                             888888888
 
-
-
-
+          ∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞
 
 <a href="http://www.mondorobot.com"><img src="mondo-logo-red.png" alt="www.mondorobot.com"/></a>
