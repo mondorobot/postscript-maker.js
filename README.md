@@ -159,5 +159,5 @@ ___
 
           ∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞
 
-<a href="http://www.mondorobot.com">mondorobot.com</a>
+<a href="http://www.mondorobot.com" target="_blank">mondorobot.com</a>
 <img src="mondo-logo-red.png" alt="www.mondorobot.com"/>
