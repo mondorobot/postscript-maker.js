@@ -5,26 +5,49 @@
     options = options || {};
 
     this.pages = [];
+
     this.config = {
-      'documentAuthor': options.author || 'Anonymous',
-      'documentTitle': options.title || 'Untitled',
-      'font': options.font || 'Helvetica',
-      'fontSize': options.fontSize || 12,
-      'fontColor': '#000000',
-      'lineWidth': options.lineWidth || 0.5,
-      'widthInches': options.widthInches || 8.5,
-      'heightInches': options.heightInches || 11,
-      'dpi': options.dpi || 72
+      'documentAuthor': options.author               || 'Anonymous',
+      'documentTitle':  options.title                || 'Untitled',
+      'font':           options.font                 || 'Helvetica',
+      'fontSize':       Number(options.fontSize)     || 12,
+      'fontColor':      options.fontColor            || '#000000',
+      'fillColor':      options.fillColor            || '#eeeeee',
+      'borderColor':    options.borderColor          || '#cccccc',
+      'borderWidth':    Number(options.borderWidth)  || 0.5,
+      'lineWidth':      Number(options.lineWidth)    || 0.5,
+      'widthInches':    Number(options.widthInches)  || 8.5,
+      'heightInches':   Number(options.heightInches) || 11,
+      'dpi':            Number(options.dpi)          || 72
     };
 
+    if (options.marginCm) {
+      this.config.marginInches = 0.393701 * options.marginCm;
+    } else if (options.margin) {
+      this.config.marginInches = options.marginInches;
+    } else {
+      this.config.marginInches = 0.5;
+    }
+
     this.config.heightPt = this.config.heightInches * this.config.dpi;
-    this.config.widthPt = this.config.widthInches * this.config.dpi;
+    this.config.widthPt  = this.config.widthInches  * this.config.dpi;
+
+    this.config.marginPt = this.config.marginInches * this.config.dpi;
+
+    this.config.pageHeightPt = this.config.heightPt - (this.config.marginPt * 2);
+    this.config.pageWidthPt  = this.config.widthPt  - (this.config.marginPt * 2);
   };
 
   PostScriptDocument.prototype = {
     // main interface {{{
     'addPage': function() {
-      var page = [];
+      var page = {
+        'x': this.config.marginPt+1,
+        'y': this.config.marginPt+1,
+        'w': this.config.pageHeightPt,
+        'h': this.config.pageWidthPt,
+        'elements': []
+      };
       this.pages.push(page);
       return page;
     },
@@ -36,7 +59,7 @@
         '%%Title: ' + this.config.documentTitle,
         '%%Pages: ' + this.pages.length,
         '%%PageOrder: Ascend',
-        '%%BoundingBox: 0 0 612 792',
+        '%%BoundingBox: 0 0 '+this.config.widthPt+' '+this.config.heightPt,
         '%%DocumentPaperSizes: Letter',
         '%%EndComments'
       ].join("\n");
@@ -50,13 +73,128 @@
           '% BEGIN PAGE',
           '%#############################################################',
           '%%Page ' + pageNum + ' ' + pageNum + "\n",
-          self.compileScript(page) + "\n",
+          self.compilePageScript(page) + "\n",
           'showpage',
           '%*************************************************************'
         ].join("\n");
       }).join("\n\n\n");
 
       return headers + "\n\n" + scripts + "\n\n" + "%%EOF\n";
+    },
+    // }}}
+
+    // size and position {{{
+    'computeBox': function(options, parent) {
+      parent = parent || {
+        computedBox: {
+          x: this.config.marginPt+1,
+          y: this.config.marginPt+1,
+          w: this.config.pageHeightPt,
+          h: this.config.pageWidthPt
+        }
+      };
+
+      var x = options.box.x;
+      var y = options.box.y;
+      var w = options.box.w;
+      var h = options.box.h;
+
+      // set the box position relative to its parent
+      xPt = parent.computedBox.x + x + 1;
+      yPt = parent.computedBox.y + y + 1;
+
+      // convert size percentages relative to parent
+      if (typeof w === 'string' && w.match(/%$/)) {
+        var wVal = Number(w.replace(/[^0-9.]/g, ''));
+        var wPt = parent.computedBox.wPt * (100 / wVal);
+      } else {
+        var wPt = options.w;
+      }
+
+      if (typeof h === 'string' && h.match(/%$/)) {
+        var hVal = Number(h.replace(/[^0-9.]/g, ''));
+        var hPt = parent.computedBox.hPt * (100 / hVal);
+      } else {
+        var hPt = options.h;
+      }
+
+      var settings = {
+        computedBox: {
+          x: xPt,
+          y: yPt,
+          w: wPt,
+          h: hPt
+        }
+      };
+
+      return settings;
+    },
+    // }}}
+
+    // compiling {{{
+    'compilePageScript': function(page) {
+      var self = this;
+
+      page.elements.each(function(el) {
+        return self.computeElement(el, page);
+      });
+
+      //var subroutines = page.computedElements.map(function(el) {
+      //  return self.compileElement(el);
+      //});
+
+      //var output = subroutines.join("\n\n");
+      var output = '';
+
+      return output;
+    },
+
+    'computeElement': function(el) {
+      switch (el.type) {
+        case 'box':
+          self.computeBox(el);
+          break;
+
+        case 'text':
+          return self.computeText(el);
+          break;
+
+        case 'line':
+          self.computeLine(el);
+          break;
+
+        default:
+          break;
+      }
+    },
+
+    'compileElement': function(el) {
+      switch (el.type) {
+        case 'box':
+          return self.drawBox(el);
+          break;
+
+        case 'text':
+          return self.drawText(el);
+          break;
+
+        case 'line':
+          return self.drawLine(el);
+          break;
+
+        default:
+          return '';
+          break;
+      }
+    },
+
+    'compileSubroutine': function(script, comments) {
+      comments = comments || '';
+
+      var output = comments + "\n" + script.join("\n");
+      var trimmed = output.replace(/\s*\n\s*/g, "\n");
+
+      return trimmed;
     },
     // }}}
 
@@ -74,45 +212,89 @@
     },
 
     'drawBox': function(options) {
-      var x = options.x;
-      var y = options.y;
-      var w = options.w;
-      var h = options.h;
-      var color = options.color;
+      var border = options.border || '';
+      var hasBorder = !!options.border;
+      var hasFill = !!options.color;
+      var x = options.xPt;
+      var y = options.yPt;
+      var w = options.wPt;
+      var h = options.hPt;
+      var fillColor = options.color || this.config.fillColor;
+      var borderColor = this.config.borderColor;
+      var borderWidth = this.config.borderWidth;
+
+      if (hasBorder) {
+        var b1 = border.split(' ')[0];
+        var b2 = border.split(' ')[1];
+
+        if (typeof b2 === 'string' && b2.match(/#/)) {
+          borderColor = b2;
+          borderWidth = Number(b1);
+        } else if (b1.match(/#/)) {
+          borderColor = b1;
+        }
+      }
 
       var comments = '% BOX: pos('+x+','+y+') dim('+w+','+h+')';
 
-      if (typeof w === 'string' && w.match(/%$/)) {
-        var wVal = Number(w.replace(/[^0-9.]/g, ''));
-        w = this.config.widthPt * (100 / wVal);
-      }
-
-      if (typeof h === 'string' && h.match(/%$/)) {
-        var hVal = Number(h.replace(/[^0-9.]/g, ''));
-        h = this.config.heightPt * (100 / hVal);
-      }
-
-      var box = this.getBoxBounds(x, y, w, h);
-
-      var bot    = box.bot;
-      var top    = box.top;
-      var left   = box.left;
-      var right  = box.right;
-
       var script = [
         'gsave',
-        this.setColor(color),
         'newpath',
         this.moveto(left, bot),
         this.lineto(left, top),
         this.lineto(right, top),
         this.lineto(right, bot),
-        'closepath',
-        'fill',
-        'grestore'
+        'closepath'
       ];
 
-      return [comments, script.join("\n")].join("\n");
+      if ((!hasBorder) && (!hasFill)) {
+        var drawFill = true;
+        var drawBorder = false;
+      } else {
+        var drawFill = hasFill;
+        var drawBorder = hasBorder;
+      }
+
+      var fillScript = ((!drawFill) ? [] : [
+        this.setColor(fillColor),
+        'fill',
+      ]).join("\n");
+
+      var borderScript = ((!drawBorder) ? [] : [
+        this.setColor(borderColor),
+        borderWidth + ' setlinewidth',
+        'stroke'
+      ]).join("\n");
+
+      if (fillScript.trim() && borderScript.trim()) {
+        fillScript = [
+          'gsave',
+          fillScript,
+          'grestore'
+        ].join("\n")+"\n";
+      }
+
+      var boxRenderScript = script.join("\n")+"\n"+fillScript+borderScript;
+
+      return [comments, boxRenderScript].join("\n");
+    },
+
+    'getPageX': function(val) {
+      if (this.config.marginPt > 0) {
+        val += this.config.marginPt;
+      }
+
+      return val;
+    },
+
+    'getPageY': function(val) {
+      val = this.config.heightPt - val;
+
+      if (this.config.marginPt > 0) {
+        val -= this.config.marginPt;
+      }
+
+      return val;
     },
 
     'drawLine': function(options) {
@@ -122,11 +304,11 @@
       var color = options.color || '#000000';
       var linewidth = options.linewidth || this.config.lineWidth || 0.5;
 
-      var p1x = from.x;
-      var p1y = this.config.heightPt - from.y;
+      var p1x = this.getPageX(from.x);
+      var p1y = this.getPageY(from.y);
 
-      var p2x = to.x;
-      var p2y = this.config.heightPt - to.y;
+      var p2x = this.getPageX(to.x);
+      var p2y = this.getPageY(to.y);
 
       var comment = '% LINE from('+from.x+','+from.y+') to('+to.x+','+to.y+')';
 
@@ -150,6 +332,7 @@
 
     'drawText': function(options) {
       var text = options.text;
+
       var x = options.x || 0;
       var y = options.y || 0;
 
@@ -157,7 +340,8 @@
       var fontSize  = (options.fontSize  || this.config.fontSize);
       var fontColor = (options.fontColor || this.config.fontColor);
 
-      y = this.config.heightPt - (y + fontSize);
+      x = this.getPageX(x);
+      y = this.getPageY(y + fontSize);
 
       var saneText = text.replace(')', "\\)");
 
@@ -176,45 +360,6 @@
         comment,
         script.join("\n")
       ].join("\n");
-    },
-    // }}}
-
-    // compiling {{{
-    'compileScript': function(elements) {
-      var self = this;
-
-      var subroutines = elements.map(function(el) {
-        switch (el.type) {
-          case 'box':
-            return self.drawBox(el);
-            break;
-
-          case 'text':
-            return self.drawText(el);
-            break;
-
-          case 'line':
-            return self.drawLine(el);
-            break;
-
-          default:
-            return '';
-            break;
-        }
-      });
-
-      var output = subroutines.join("\n\n");
-
-      return output;
-    },
-
-    'compileSubroutine': function(script, comments) {
-      comments = comments || '';
-
-      var output = comments + "\n" + script.join("\n");
-      var trimmed = output.replace(/\s*\n\s*/g, "\n");
-
-      return trimmed;
     },
     // }}}
 
@@ -238,8 +383,8 @@
     },
 
     'getBoxBounds': function(x, y, w, h) {
-      var top = this.config.heightPt - y;
-      var left = x;
+      var top  = this.getPageY(y);
+      var left = this.getPageX(x);
 
       var bot   = top - h;
       var right = left + w;
